@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 import joblib
-
+import os
 
 class ModelPvoutTrainer:
     model = None
@@ -38,3 +38,8 @@ class ModelPvoutTrainer:
         if (self.model == None):
             return "You have not created model yet!"
         joblib.dump(self.model, self.path_output)
+
+    def load_model(self):
+        if (not os.path.exists(self.path_output)):
+            print("You have not created model yet!")
+        return joblib.load(self.path_output)

@@ -5,6 +5,7 @@ import joblib
 import pandas
 import os
 
+
 class ModelNPVTrainer:
     temp = 1.075  # Темпы роста цен на электроэнергию
     infl = 1.09  # Инфляция
@@ -31,7 +32,8 @@ class ModelNPVTrainer:
             pvout = row['PVOUT']
 
             npv = float('-inf')
-            for n in [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]:
+            for n in [0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5, 5.25,
+                      5.5, 5.75, 6]:
                 res = -self.pv_cost * n
                 for j in range(1, 20):
                     Ci = (self.temp ** j) * demand * 12 * costElectr
@@ -41,7 +43,7 @@ class ModelNPVTrainer:
                 npv = max(npv, res)
             data.at[index, 'NPV'] = npv
 
-        data.to_excel('project/training/datasets/output.xlsx', index=False)
+        data.to_excel('project/training/datasets/outputNPV.xlsx', index=False)
         return data
 
     def train(self):
@@ -86,6 +88,6 @@ class ModelNPVTrainer:
         joblib.dump(self.model, self.path_output)
 
     def load_model(self):
-        if (os.path.exists(self.path_output)):
+        if (not os.path.exists(self.path_output)):
             print("You have not created model yet!")
         return joblib.load(self.path_output)
