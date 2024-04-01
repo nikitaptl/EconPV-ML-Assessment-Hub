@@ -1,9 +1,10 @@
 from __future__ import annotations
 import tkinter as tk
+import pandas
 from tkinter import messagebox
-from project.domain.Predictor import Predictor
-from project.presentation.State import State, MainState
-
+from project.domain.Predictor import Predictor, Response
+from project.presentation.States.State import State
+from project.presentation.States.MainState import MainState
 
 class ClientApplication(tk.Tk):
     valuePvout = None
@@ -12,10 +13,13 @@ class ClientApplication(tk.Tk):
     font = "Arial"
     predictor = Predictor()
     state: State = None
+    pathRegions = "project/training/datasets/SubjectsRF.xlsx"
+    data_regions = None
 
     def __init__(self, font="Arial"):
         super().__init__()
-        self.geometry("600x400")
+        self.data_regions = pandas.read_excel(self.pathRegions)
+        self.geometry("600x500")
         self.title("EconPV")
         self.font = font
         self.state = MainState.get_state(self)
@@ -80,6 +84,13 @@ class ClientApplication(tk.Tk):
             else:
                 new_text = f"Установка солнечной батареи в этом месте и в этих условиях имеет большой экономический потенциал! Чистая приведённая стоимость составила {self.valueNPV}"
             self.text_result.insert(tk.END, new_text)
+
+    def check_region(self, region_name) -> Response:
+        if region_name in self.data_regions['Region'].values:
+            price = self.data_regions.loc[self.data_regions['Region'] == region_name, 'Price'].values[0]
+            return Response(True, price)
+        else:
+            return Response(False, "Региона с таким названием нет в списке регионов РФ")
 
 app = ClientApplication("Montserrat")
 app.mainloop()
